@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>វាយអក្សរខ្មែរ! | クメールタイピング・チャンピオン(オフライン版)</title>
+<meta name="description" content="Khmer typing practice game - fully offline / クメール語タイピング練習(完全オフライン)" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⌨️</text></svg>" />
+<style>
+:root{
+  --cream:#FFF7E6; --gold:#F2B705; --goldD:#C98F00; --red:#D6002A;
+  --blue:#123B9C; --blueD:#0B2568; --ink:#2B1D0A; --jade:#0FA36B; --paper:#fff;
+  --kh:'Noto Sans Khmer','Khmer OS System','Khmer OS','Khmer UI','Leelawadee UI',sans-serif;
+  --jp:'Yu Gothic UI','Meiryo','Hiragino Sans','Noto Sans JP',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  min-height:100vh;background:var(--cream);color:var(--ink);font-family:var(--jp);
+  background-image:radial-gradient(#F2B70522 1.5px,transparent 1.5px);background-size:26px 26px;
+}
+#root{display:flex;flex-direction:column;align-items:center;padding:18px 12px 40px;min-height:100vh}
+.kh{font-family:var(--kh)}
+.sub{font-size:12px;color:#8A7250;font-weight:700}
+.card{background:var(--paper);border-radius:26px;padding:22px;width:min(600px,96%);
+  box-shadow:0 10px 30px rgba(43,29,10,.12);border:4px solid var(--gold);margin-top:18px}
+.card.blue{border-color:var(--blue)}
+.bigbtn{display:block;width:100%;border:none;border-radius:22px;padding:16px 26px;cursor:pointer;
+  font-family:var(--jp);box-shadow:0 6px 0 rgba(0,0,0,.18);text-align:center;margin-top:12px}
+.bigbtn:active{transform:translateY(3px)}
+.bigbtn .t1{font-family:var(--kh);font-weight:900}
+.bigbtn .t2{font-size:12px;font-weight:700}
+.bb-red{background:var(--red);color:#fff}.bb-red .t2{color:#FFD9E0}
+.bb-blue{background:var(--blue);color:#fff}.bb-blue .t2{color:#CBD8FF}
+.bb-sand{background:#EFE6D2;color:var(--ink)}.bb-sand .t2{color:#8A7250}
+.optbtn{padding:12px 18px;border-radius:14px;cursor:pointer;font-family:var(--jp);font-weight:800;
+  font-size:15px;border:3px solid #E8DCC2;background:#FFFDF5}
+.optbtn.on{border-color:var(--red);background:#FFE9EC}
+.hourbtn{padding:12px 0;border-radius:14px;cursor:pointer;font-weight:800;font-size:20px;
+  border:3px solid #E8DCC2;background:#FFFDF5;color:var(--ink)}
+.hourbtn.on{border-color:var(--red);background:var(--red);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.chip{border-radius:16px;padding:8px 16px;font-weight:800}
+.key{width:52px;height:52px;border-radius:10px;position:relative;background:#FFFDF5;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:3px solid #ccc;box-shadow:0 2px 0 rgba(0,0,0,.10)}
+.key .main{font-family:var(--kh);font-size:21px;font-weight:900;line-height:1;color:var(--ink)}
+.key .lat{font-size:10px;font-weight:700;color:#A08A62}
+.key .shf{position:absolute;top:2px;right:5px;font-family:var(--kh);font-size:10px;font-weight:700;color:#B8A379}
+.key .home{position:absolute;bottom:3px;width:14px;height:3px;border-radius:2px}
+.key.next{border-color:var(--ink) !important;animation:kpulse .7s ease-in-out infinite}
+.key.next .main,.key.next .lat{color:#fff}.key.next .shf{color:#FFFFFFAA}
+.kbrow{display:flex;gap:6px;justify-content:center}
+.dot{width:14px;height:14px;border-radius:999px;background:#EDE3CC;border:3px solid transparent;transition:background .15s}
+.dot.done{background:var(--jade)}.dot.cur{background:var(--gold);border-color:var(--goldD)}
+.ladder{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;background:#EDE3CC;color:#B8A379;border:3px solid transparent}
+.ladder.done{background:var(--jade);color:#fff}.ladder.cur{background:var(--gold);color:#fff;border-color:var(--goldD)}
+.rankrow{display:flex;justify-content:space-between;padding:6px 6px;border-bottom:1px dashed #E8DCC2;
+  font-family:var(--kh);font-weight:700;border-radius:8px}
+.rankrow.me{background:#FFF3C4}
+input[type=text]{padding:12px 14px;border-radius:14px;border:3px solid var(--blue);font-size:17px;font-family:var(--kh);width:100%}
+.whybtn{text-align:left;padding:12px 14px;border-radius:16px;cursor:pointer;border:3px solid #E8DCC2;background:#FFFDF5;width:100%;margin-top:8px}
+.whybtn.on{border-color:var(--jade);background:#E7F8F0}
+.learncard{background:var(--paper);border-radius:20px;padding:16px;border:3px solid var(--gold)}
+.legend{display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:4px 12px;border:2px solid #ccc}
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60}
+#confetti span{position:absolute;top:-6%;animation:kfall 1.2s ease-in forwards}
+#ovl{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:50;pointer-events:none}
+#ovl .box{background:linear-gradient(135deg,var(--gold),#FFDE6B);border-radius:32px;padding:30px 50px;
+  border:6px solid var(--red);box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center;animation:kpop .4s ease-out}
+.shakebox{animation:kshake .18s}
+@keyframes kfall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(340deg);opacity:.8}}
+@keyframes kpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes kpop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes kshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+button:focus-visible{outline:4px solid var(--blue);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none !important}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="confetti"></div>
+<div id="ovl"><div class="box" id="ovlbox"></div></div>
+<script>
+"use strict";
+/* ================= KEYBOARD (NIDA: [latin, base, shift]) ================= */
+const KEY_ROWS=[
+ [["1","១","!"],["2","២","ៗ"],["3","៣","៛"],["4","៤","$"],["5","៥","%"],["6","៦","៍"],["7","៧","័"],["8","៨","៏"],["9","៩","("],["0","០",")"]],
+ [["q","ឆ","ឈ"],["w","ឹ","ឺ"],["e","េ","ែ"],["r","រ","ឬ"],["t","ត","ទ"],["y","យ","ួ"],["u","ុ","ូ"],["i","ិ","ី"],["o","ោ","ៅ"],["p","ផ","ភ"]],
+ [["a","ា","ាំ"],["s","ស","ៃ"],["d","ដ","ឌ"],["f","ថ","ធ"],["g","ង","អ"],["h","ហ","ះ"],["j","្","ញ"],["k","ក","គ"],["l","ល","ឡ"],["'","់","៉"]],
+ [["z","ឋ","ឍ"],["x","ខ","ឃ"],["c","ច","ជ"],["v","វ","ៀ"],["b","ប","ព"],["n","ន","ណ"],["m","ម","ំ"]]];
+const KEYINFO={},BASE2KH={},SHIFT2KH={};
+KEY_ROWS.forEach(r=>r.forEach(([la,b,s])=>{if(s&&!(s in KEYINFO))KEYINFO[s]={latin:la,shift:true};}));
+KEY_ROWS.forEach(r=>r.forEach(([la,b])=>{KEYINFO[b]={latin:la,shift:false};}));
+KEY_ROWS.forEach(r=>r.forEach(([la,b,s])=>{BASE2KH[la]=b;if(s)SHIFT2KH[la]=s;}));
+const FINGERS={
+ lp:{kh:"កូនដៃឆ្វេង",jp:"左の小指",color:"#E85D9E"},
+ lr:{kh:"នាងដៃឆ្វេង",jp:"左の薬指",color:"#9B5DE5"},
+ lm:{kh:"កណ្ដាលដៃឆ្វេង",jp:"左の中指",color:"#3A86FF"},
+ li:{kh:"ចង្អុលដៃឆ្វេង",jp:"左の人さし指",color:"#0FA36B"},
+ ri:{kh:"ចង្អុលដៃស្ដាំ",jp:"右の人さし指",color:"#F2B705"},
+ rm:{kh:"កណ្ដាលដៃស្ដាំ",jp:"右の中指",color:"#FB8B24"},
+ rr:{kh:"នាងដៃស្ដាំ",jp:"右の薬指",color:"#E4572E"},
+ rp:{kh:"កូនដៃស្ដាំ",jp:"右の小指",color:"#8338EC"}};
+const FINGER_MAP={q:"lp",a:"lp",z:"lp","1":"lp",w:"lr",s:"lr",x:"lr","2":"lr",e:"lm",d:"lm",c:"lm","3":"lm",
+ r:"li",t:"li",f:"li",g:"li",v:"li",b:"li","4":"li","5":"li",y:"ri",u:"ri",h:"ri",j:"ri",n:"ri",m:"ri","6":"ri","7":"ri",
+ i:"rm",k:"rm","8":"rm",o:"rr",l:"rr","9":"rr",p:"rp","0":"rp","'":"rp"};
+const HOME_KEYS=["a","s","d","f","h","j","k","l"];
+
+/* ================= LEVELS 1–10 × 10 PATTERNS ================= */
+const L9_SENT=[
+ ["បច្ចេកវិទ្យាជួយខ្ញុំរៀនអ្វីថ្មី","テクノロジーは、新しいことを学ぶ力をくれる"],
+ ["រៀនវាយអក្សរជួយខ្ញុំរកការងារល្អ","タイピングは、よい仕事への切符になる"],
+ ["ចំណេះដឹងគឺជាកម្លាំងរបស់ខ្ញុំ","知識は、わたしの力だ"],
+ ["បច្ចេកវិទ្យាបើកទ្វារអនាគត","テクノロジーは、未来のとびらをひらく"],
+ ["ខ្ញុំអាចរៀនពីពិភពលោកទាំងមូល","わたしは世界中から学ぶことができる"],
+ ["រៀនថ្ងៃនេះដើម្បីអនាគតល្អ","今日の学びは、よい未来のため"],
+ ["ខ្ញុំអាចជួយគ្រួសារដោយចំណេះថ្មី","新しい知識で、家族を助けられる"],
+ ["បច្ចេកវិទ្យាជួយសាលារបស់ខ្ញុំ","テクノロジーは、わたしの学校を助ける"],
+ ["ខ្ញុំរៀនវាយអក្សរដើម្បីសុបិនរបស់ខ្ញុំ","わたしは夢のためにタイピングを学ぶ"],
+ ["វាយអក្សរល្អគឺជាជំនាញសំខាន់","正しいタイピングは、大切なスキルだ"]];
+const L10_SENT=[
+ ["អ្នករៀនបច្ចេកវិទ្យាអាចផ្លាស់ប្ដូរពិភពលោក","テクノロジーを学ぶ人は、世界を変えられる"],
+ ["បច្ចេកវិទ្យាជួយខ្ញុំនិយាយជាមួយពិភពលោក","テクノロジーで、世界とつながって話せる"],
+ ["ចំណេះបច្ចេកវិទ្យាជួយភូមិនិងសាលារបស់ខ្ញុំ","ICTの知識は、わたしの村と学校を助ける"],
+ ["ខ្ញុំរៀនថ្ងៃនេះដើម្បីជួយគ្រួសារនៅអនាគត","今日学ぶのは、将来家族を助けるため"],
+ ["វាយអក្សរគឺជាជំហានដំបូងនៃបច្ចេកវិទ្យា","タイピングは、ICTへの第一歩だ"],
+ ["ចំណេះដឹងថ្មីនាំខ្ញុំទៅកាន់អនាគតល្អ","新しい知識が、よい未来へ連れて行く"],
+ ["បច្ចេកវិទ្យាជួយខ្ញុំរៀនភាសានិងវិទ្យាសាស្ត្រ","テクノロジーで、言語も科学も学べる"],
+ ["ខ្ញុំអាចបង្ហាញគំនិតរបស់ខ្ញុំដល់ពិភពលោក","自分の考えを、世界に発信できる"],
+ ["អ្នកចេះបច្ចេកវិទ្យាអាចជួយអ្នកដទៃបានច្រើន","ICTができる人は、多くの人を助けられる"],
+ ["បច្ចេកវិទ្យាធ្វើសុបិនរបស់ខ្ញុំកាន់តែធំ","テクノロジーは、わたしの夢を大きくする"]];
+const LEVEL_PATTERNS=[
+ ["ថថថកកក","កកកដដដ","ដដដលលល","សសសហហហ","លលលាាា","ហហហថថថ","កដកដកដ","ថកថកថក","សលសលសល","ដាដាដា"],
+ ["កាលដាស","ថាកាហា","សាលាដា","ហាកាថា","លាដាសា","កាសាថា","ដាហាលា","ថាលាកា","សាកាដា","ហាថាសា"],
+ ["តាតេតិ","រករេរា","កុកិកា","តេរេសេ","រិតិលិ","កុរុតុ","តារាកា","សេដេហេ","តុតាតិ","រុរាតេ"],
+ ["បានមាន","ចាបវាចា","នាមបាច","មិនបុន","វាចាបា","នុបុមុ","ចេបេនេ","មាបានា","វិនិចិ","បោមោនោ"],
+ ["កោសោមោ","តឹរឹកឹ","ខាឆាផា","យាយោយុ","ងាងោងេ","ផិផាផុ","ឆេឆាឆិ","ខុខោខា","យិងិកិ","តោមោបោ"],
+ ["កាតេមិនោ","សុរាបិយា","ខោឆាតុរេ","ផាយិងោកា","បេវាមុនិ","តោសាកិរា","ហេងាចុតា","មោបាយេកុ","ដិថោសាវា","រុលេនាកិ"],
+ ["បាយមាន","សាលាការ","ក្មេងមក","ឆ្មាបាន","ខ្លាមាន","ចានបាយ","នាងមកវាល","តាមានចាន","ក្បាលខ្លា","ស្លាបមាន"],
+ ["ក្មេងមកសាលា","នាងបានបាយ","តាមានចានបាយ","ឆ្មាមកសាលា","ខ្លាមានស្លាប","ក្មេងបានចាន","នាងមកវាលការ","តាមកសាលា","ក្ដាមមានក្បាល","ក្មេងតាមឆ្មា"],
+ L9_SENT, L10_SENT];
+const STAGE_OF=lv=>lv<=2?["ទីតាំងម្រាមដៃ","ホームポジション"]:lv<=4?["គ្រាប់ចុច","キー練習"]:
+ lv<=6?["ព្យាង្គ","音のかたまり"]:lv<=8?["ពាក្យ","ことば"]:["ប្រយោគ ICT","ICTの文章"];
+function genLevel(lv,avoid){
+  const pool=LEVEL_PATTERNS[Math.min(lv,10)-1];
+  let e=pool[Math.floor(Math.random()*pool.length)];
+  for(let i=0;i<4;i++){const t=Array.isArray(e)?e[0]:e;if(t!==avoid)break;e=pool[Math.floor(Math.random()*pool.length)];}
+  return Array.isArray(e)?{text:e[0],jp:e[1]}:{text:e,jp:null};
+}
+const PRAISE=[["ជោគជ័យ!","やったね!"],["អស្ចារ្យ!","すごい!"],["ល្អណាស់!","とてもいいね!"],
+ ["ពូកែមែន!","じょうずだね!"],["បន្តទៀត!","その調子!"],["អបអរសាទរ!","おめでとう!"]];
+const ANIMALS=["🐯","🐘","🐒","🦋","🐓","🐢","🐬","🦚","🐝","🐸","🦉","🐟"];
+const CONF=["🎉","✨","🌟","🪷","💛","❤️","💙","🎊","⭐"];
+
+/* ================= STORAGE (オフラインでも保存) ================= */
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* ================= SOUND ================= */
+let audioCtx=null;
+function ac(){if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended")audioCtx.resume();return audioCtx;}
+function tone(f,dur,type,vol,delay){
+  if(!S.soundOn)return;
+  try{const a=ac(),t0=a.currentTime+(delay||0),o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(vol,t0+0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  o.connect(g);g.connect(a.destination);o.start(t0);o.stop(t0+dur+0.05);}catch(e){}
+}
+const SND={
+ correct:()=>tone(920,.09,"triangle",.12),
+ wrong:()=>tone(150,.18,"sawtooth",.10),
+ levelUp:()=>{[523,659,784,1047].forEach((f,i)=>tone(f,.22,"triangle",.18,i*.09));tone(1568,.4,"sine",.10,.36);},
+ finish:()=>{[523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,.3,"triangle",.18,i*.14));}};
+
+/* ================= STATE ================= */
+const S={
+  screen:"home", group:null, reason:"",
+  minutes:lsGet("kt-min",3), startLevel:lsGet("kt-start",1), soundOn:lsGet("kt-snd",true),
+  level:1,bonus:0,target:"",targetJp:null,pos:0,timeLeft:0,correct:0,err:0,cleared:0,
+  myId:null,myTag:null,timerId:null,
+  board:lsGet("kt-board",[]),      // このPCのランキング
+};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+/* ================= CONFETTI / OVERLAY ================= */
+function confetti(){
+  const c=$("confetti");
+  for(let i=0;i<26;i++){
+    const sp=document.createElement("span");
+    sp.textContent=CONF[Math.floor(Math.random()*CONF.length)];
+    sp.style.left=(5+Math.random()*90)+"%";
+    sp.style.fontSize=(20+Math.random()*26)+"px";
+    sp.style.animationDuration=(0.9+Math.random()*0.7)+"s";
+    sp.style.animationDelay=(Math.random()*0.25)+"s";
+    c.appendChild(sp);
+    setTimeout(()=>sp.remove(),2200);
+  }
+}
+function showOverlay(html,ms){
+  $("ovlbox").innerHTML=html;$("ovl").style.display="flex";
+  setTimeout(()=>{$("ovl").style.display="none";},ms);
+}
+
+/* ================= RENDER HELPERS ================= */
+function bi(kh,jp,khSize,color){
+  return `<div style="text-align:center;line-height:1.35">
+    <div class="kh" style="font-size:${khSize||18}px;font-weight:700;color:${color||"var(--ink)"}">${kh}</div>
+    <div class="sub">${jp}</div></div>`;
+}
+function keyboardHTML(compact){
+  const w=compact?44:52;
+  let html='<div style="display:flex;flex-direction:column;gap:6px;align-items:center">';
+  KEY_ROWS.forEach((row,ri)=>{
+    html+=`<div class="kbrow" style="margin-left:${ri===2?w*0.3:ri===3?0:0}px">`;
+    if(ri===3)html+=`<div class="key" id="k-shift" style="width:${w*1.4}px;height:${w}px;border-color:#C9B486"><div class="lat" style="font-size:12px">⇧ Shift</div></div>`;
+    row.forEach(([la,b,s])=>{
+      const f=FINGERS[FINGER_MAP[la]]||FINGERS.rp;
+      const kid="k-"+(la==="'"?"ap":la);
+      html+=`<div class="key" id="${kid}" data-base="${esc(b)}" data-shift="${esc(s||"")}" data-color="${f.color}"
+        style="width:${w}px;height:${w}px;border-color:${f.color}">
+        ${s?`<div class="shf">${esc(s)}</div>`:""}
+        <div class="main">${esc(b)}</div>
+        <div class="lat">${la==="'"?"'":la.toUpperCase()}</div>
+        ${HOME_KEYS.includes(la)?`<div class="home" style="background:${f.color}"></div>`:""}</div>`;
+    });
+    html+="</div>";
+  });
+  html+=`<div class="key" style="width:${w*6}px;height:${compact?26:32}px;border-color:#C9B486"><div class="lat">Space</div></div></div>`;
+  return html;
+}
+function legendHTML(){
+  return '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">'+
+    Object.values(FINGERS).map(f=>`<div class="legend" style="border-color:${f.color}">
+      <div style="width:12px;height:12px;border-radius:999px;background:${f.color}"></div>
+      <span class="kh" style="font-size:12px;font-weight:700">${f.kh}</span>
+      <span class="sub" style="font-size:11px">${f.jp}</span></div>`).join("")+"</div>";
+}
+function rankRows(rows,myId){
+  return rows.map((r,i)=>`<div class="rankrow${r.id===myId?" me":""}">
+    <span>${["🥇","🥈","🥉"][i]||`${i+1}.`} ${r.tag}${r.id===myId?" ←あなた":""}</span>
+    <span style="color:var(--blue)">Lv.${r.level}${r.bonus?` +${r.bonus}`:""} <span class="sub" style="font-size:12px">(${r.keys}打 / ${r.acc}%)</span></span>
+  </div>`).join("");
+}
+const sortRows=rows=>rows.slice().sort((a,b)=>(b.level+b.bonus)-(a.level+a.bonus)||b.keys-a.keys);
+
+/* ================= SCREENS ================= */
+function render(){
+  const r=$("root");
+  if(S.screen==="home")r.innerHTML=homeHTML();
+  else if(S.screen==="why")r.innerHTML=whyHTML();
+  else if(S.screen==="learn")r.innerHTML=learnHTML();
+  else if(S.screen==="teacher")r.innerHTML=teacherHTML();
+  else if(S.screen==="game")r.innerHTML=gameHTML();
+  else if(S.screen==="result")r.innerHTML=resultHTML();
+  if(S.screen==="game")updateGame();
+  window.scrollTo(0,0);
+}
+function show(sc){S.screen=sc;render();}
+
+function homeHTML(){
+  const rows=S.group!=null?sortRows(S.board.filter(x=>x.group===S.group)):[];
+  return `
+  <div style="margin-top:20px;text-align:center">
+    <div style="font-size:46px">🪷⌨️🇰🇭</div>
+    <div class="kh" style="font-size:44px;font-weight:900;color:var(--blueD);text-shadow:3px 3px 0 var(--gold)">វាយអក្សរខ្មែរ!</div>
+    <div style="font-size:16px;font-weight:800;color:var(--red)">クメールタイピング・チャンピオン</div>
+    <div class="kh sub" style="font-size:14px;margin-top:4px">កម្រិត ១ ដល់ ១០ · レベル1〜10 ・ 📴 オフラインOK</div>
+  </div>
+  <div class="card">
+    ${bi("🕐 ឥឡូវម៉ោងប៉ុន្មាន? ចុចលេខម៉ោង!","いまのじかんの数字をタップ!(1:55なら「1」)",18)}
+    <div class="sub kh" style="text-align:center;margin-top:4px;font-size:11px">ចុចលេខដូចគ្នា = ប្រកួតជាមួយគ្នា ・ 同じ数字をタップした友だちと競争!</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px">
+      ${[1,2,3,4,5,6,7,8,9,10,11,12].map(h=>`<button class="hourbtn${S.group===h?" on":""}" onclick="pickGroup(${h})">${h}</button>`).join("")}
+    </div>
+    ${S.group!=null?`<div style="text-align:center;margin-top:8px;font-size:13px;font-weight:800;color:var(--jade)">✓ ក្រុមម៉ោង ${S.group} ・ グループ「${S.group}」で競争!</div>`:""}
+    <button class="bigbtn bb-red" style="opacity:${S.group==null?0.45:1}" onclick="startFromHome()">
+      <div class="t1" style="font-size:22px">ចាប់ផ្ដើមលេង! 🚀</div><div class="t2">スタート!</div></button>
+    <button class="bigbtn bb-blue" onclick="show('learn')">
+      <div class="t1" style="font-size:18px">រៀនពីរបៀបវាយ 📖</div><div class="t2">タイピングのまえに(姿勢・指のおき方)</div></button>
+    <button class="bigbtn bb-sand" onclick="show('teacher')">
+      <div class="t1" style="font-size:15px">⚙️ សម្រាប់គ្រូ</div><div class="t2">先生用の設定(時間・開始レベル)</div></button>
+    <div class="sub" style="text-align:center;margin-top:14px">⏱ ${S.minutes}分 / ${S.minutes} នាទី ・ 開始レベル ${S.startLevel} ・ 🔊 ${S.soundOn?"ON":"OFF"}</div>
+  </div>
+  ${S.group!=null&&rows.length?`<div class="card blue">
+    ${bi(`🏆 ចំណាត់ថ្នាក់ក្រុមម៉ោង ${S.group}`,`グループ「${S.group}」のランキング(このPC)`,18)}
+    ${rankRows(rows,S.myId)}</div>`:""}`;
+}
+window.pickGroup=h=>{S.group=h;render();};
+window.startFromHome=()=>{if(S.group==null)return;S.reason?startGame():show("why");};
+
+function whyHTML(){
+  const opts=[["💼","ដើម្បីរកការងារល្អនៅពេលអនាគត","しょうらい、いい仕事につくため"],
+   ["👨‍👩‍👧","ដើម្បីជួយគ្រួសាររបស់ខ្ញុំ","家族をたすけるため"],
+   ["💻","ដើម្បីប្រើកុំព្យូទ័របានដោយខ្លួនឯង","自分でパソコンを使えるようになるため"],
+   ["🌏","ដើម្បីរៀនអ្វីថ្មីៗពីពិភពលោក","世界の新しいことを学ぶため"]];
+  return `<div class="card" style="margin-top:30px">
+    ${bi("🤔 ហេតុអ្វីបានជាខ្ញុំរៀនវាយអក្សរ?","なぜタイピングを学ぶの?(自分のことばで決めよう)",22)}
+    <div class="kh sub" style="text-align:center;margin-top:6px;font-size:13px">ជ្រើសរើសមូលហេតុរបស់អ្នក ឬសរសេរដោយខ្លួនឯង<br>えらんでも、自分で書いてもOK。「自分の理由」が上達のエンジンです。</div>
+    ${opts.map((o,i)=>`<button class="whybtn${S.reason===o[1]?" on":""}" onclick="pickReason(${i})">
+      <span style="font-size:22px;margin-right:8px">${o[0]}</span>
+      <span class="kh" style="font-weight:700;font-size:16px">${o[1]}</span>
+      <div class="sub" style="margin-left:34px">${o[2]}</div></button>`).join("")}
+    <input type="text" id="whyfree" placeholder="✨ មូលហេតុផ្ទាល់ខ្លួន… / 自分だけの理由を書いてもOK"
+      style="margin-top:8px;border:3px dashed var(--gold)" oninput="S.reason=this.value">
+    <div style="display:flex;gap:10px;margin-top:18px;justify-content:center">
+      <button class="bigbtn bb-red" style="width:auto;opacity:${S.reason?1:0.45}" onclick="if(S.reason)startGame()">
+        <div class="t1" style="font-size:20px">តោះលេង! 🚀</div><div class="t2">この理由でスタート!</div></button>
+      <button class="bigbtn bb-sand" style="width:auto" onclick="show('home')">
+        <div class="t1" style="font-size:14px">ត្រឡប់</div><div class="t2">もどる</div></button>
+    </div></div>`;
+}
+window.pickReason=i=>{
+  const kh=[["ដើម្បីរកការងារល្អនៅពេលអនាគត"],["ដើម្បីជួយគ្រួសាររបស់ខ្ញុំ"],["ដើម្បីប្រើកុំព្យូទ័របានដោយខ្លួនឯង"],["ដើម្បីរៀនអ្វីថ្មីៗពីពិភពលោក"]][i][0];
+  S.reason=kh;render();
+};
+
+function learnHTML(){
+  const card=(emo,kh,jp,bodyKh,bodyJp)=>`<div class="learncard">
+    <div style="font-size:30px;text-align:center">${emo}</div>${bi(kh,jp,17)}
+    <div class="kh" style="font-size:13.5px;margin-top:8px;line-height:1.7">${bodyKh}<br><span class="sub" style="font-family:var(--jp)">${bodyJp}</span></div></div>`;
+  return `<div style="width:min(760px,96%);margin-top:10px">
+    ${bi("📖 មុននឹងវាយអក្សរ","タイピングのまえに",28,"var(--blueD)")}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px">
+      ${card("🧍","ឥរិយាបថអង្គុយ","姿勢","អង្គុយត្រង់ខ្នង ជើងទាំងពីរដល់ដី កែងដៃបត់ ៩០ ដឺក្រេ។","背すじをのばし、足のうらを床に。ひじは90度。")}
+      ${card("📏","ចម្ងាយពីអេក្រង់","画面との距離","អង្គុយឲ្យឆ្ងាយពីអេក្រង់ប្រវែងមួយដៃ (៥០–៧០ សង់ទីម៉ែត្រ)។","うでをのばした長さ(50〜70cm)くらい離れよう。")}
+      ${card("🖐️","ទីតាំងម្រាមដៃដំបូង","最初におく指(ホームポジション)",
+        "ដៃឆ្វេងដាក់លើ <b style='color:var(--red)'>ា ស ដ ថ</b> · ដៃស្ដាំដាក់លើ <b style='color:var(--blue)'>ហ ្ ក ល</b>។ គ្រាប់ចុច F(ថ) និង J(្) មានស្នាមប៉ោង—ស្ទាបរកដោយមិនមើល!",
+        "左手は「ា ស ដ ថ」、右手は「ហ ្ ក ល」。FとJの小さなでっぱりを目印に、見ないで戻れるように。")}
+      ${card("⚡","គន្លឹះវាយលឿន","速くなるコツ","១. មើលអេក្រង់ កុំមើលដៃ ២. ត្រឹមត្រូវមុន លឿនក្រោយ ៣. វាយតាមចង្វាក់ដូចភ្លេង ៤. ហាត់បន្តិចរាល់ថ្ងៃ។","①手を見ない ②正確さが先、速さはあと ③リズムよく ④毎日すこしずつ。")}
+    </div>
+    <div class="learncard" style="border-color:var(--blue);margin-top:14px">
+      ${bi("🎹 ម្រាមណាចុចគ្រាប់ណា (មើលពណ៌!)","どの指でどのキー?(色で見よう)",18)}
+      <div style="margin-top:12px;overflow-x:auto">${keyboardHTML(true)}</div>
+      <div style="margin-top:12px">${legendHTML()}</div>
+      <div class="kh sub" style="text-align:center;margin-top:10px;font-size:12px">
+        បន្ទាត់តូចក្រោមអក្សរ = កន្លែងដាក់ម្រាមដៃដំបូង · អក្សរតូចខាងលើ = ចុចជាមួយ Shift<br>
+        <span style="font-family:var(--jp)">下線つきのキー=ホームポジション ・ キー右上の小さい文字=Shiftをおしながら</span></div>
+    </div>
+    <div style="text-align:center;margin-top:16px;display:flex;gap:10px;justify-content:center">
+      <button class="bigbtn bb-red" style="width:auto" onclick="learnStart()">
+        <div class="t1" style="font-size:18px">យល់ហើយ! តោះលេង 🚀</div>
+        <div class="t2">${S.group==null?"まず時刻の数字をタップ(ホームへ)":"わかった!スタートへ"}</div></button>
+      <button class="bigbtn bb-sand" style="width:auto" onclick="show('home')">
+        <div class="t1" style="font-size:14px">ត្រឡប់</div><div class="t2">もどる</div></button>
+    </div></div>`;
+}
+window.learnStart=()=>{if(S.group==null){show("home");return;}S.reason?startGame():show("why");};
+
+function teacherHTML(){
+  const opt=(on,fn,label)=>`<button class="optbtn${on?" on":""}" onclick="${fn}">${label}</button>`;
+  return `<div class="card blue" style="margin-top:30px">
+    ${bi("⚙️ សម្រាប់គ្រូ","先生用の設定",24,"var(--blueD)")}
+    <div style="margin-top:18px">${bi("⏱ រយៈពេល","タイピング時間(全員に共通)",16)}
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        ${[1,2,3,5].map(m=>opt(S.minutes===m,`setMin(${m})`,m+"分")).join("")}</div></div>
+    <div style="margin-top:18px">${bi("🚩 កម្រិតចាប់ផ្ដើម","開始レベル(得意な子はLv.9の文章から)",16)}
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        ${opt(S.startLevel===1,"setStart(1)","Lv.1 キー")}${opt(S.startLevel===5,"setStart(5)","Lv.5 音節")}
+        ${opt(S.startLevel===7,"setStart(7)","Lv.7 ことば")}${opt(S.startLevel===9,"setStart(9)","Lv.9 ICT文章")}</div></div>
+    <div style="margin-top:18px">${bi("🔊 សំឡេង","効果音",16)}
+      <div style="display:flex;gap:8px;margin-top:8px">
+        ${opt(S.soundOn,"setSnd(true)","ON")}${opt(!S.soundOn,"setSnd(false)","OFF")}</div></div>
+    <div class="sub" style="margin-top:12px;line-height:1.7">
+      💡 完全オフラインで動きます(このファイルだけでOK)。レベル1〜10×各10パターンのランダム出題。Lv.9〜10はICTの価値づけ文章。時刻の数字タップで同じグループの生徒どうしが競争し、制限時間は全員この設定で共通です。記録はこのPCのブラウザに自動保存されます。</div>
+    <div style="text-align:center;margin-top:16px">
+      <button class="bigbtn bb-blue" style="width:auto" onclick="show('home')">
+        <div class="t1" style="font-size:16px">រក្សាទុក ✓</div><div class="t2">保存してもどる</div></button></div></div>`;
+}
+window.setMin=m=>{S.minutes=m;lsSet("kt-min",m);render();};
+window.setStart=l=>{S.startLevel=l;lsSet("kt-start",l);render();};
+window.setSnd=b=>{S.soundOn=b;lsSet("kt-snd",b);render();};
+
+/* ---- GAME ---- */
+function startGame(){
+  ac&&SND.correct&&ac(); /* unlock audio */
+  S.level=S.startLevel;S.bonus=0;S.correct=0;S.err=0;S.cleared=0;
+  S.timeLeft=S.minutes*60;
+  loadLevel(S.startLevel,null);
+  show("game");
+  clearInterval(S.timerId);
+  S.timerId=setInterval(tick,1000);
+}
+window.startGame=startGame;
+function tick(){
+  if(S.screen!=="game"){clearInterval(S.timerId);return;}
+  S.timeLeft--;
+  if(S.timeLeft<=0){finishGame();return;}
+  updateTimer();
+}
+function finishGame(){
+  clearInterval(S.timerId);
+  SND.finish();confetti();
+  saveResult();
+  show("result");
+}
+window.endEarly=()=>{S.timeLeft=0;finishGame();};
+function loadLevel(lv,avoid){
+  const g=genLevel(lv,avoid);
+  S.target=g.text;S.targetJp=g.jp;S.pos=0;
+}
+function gameHTML(){
+  const chars=[...S.target];
+  const [stKh,stJp]=STAGE_OF(S.level);
+  const lvl=S.bonus>0?`Lv.10 +${S.bonus}`:`Lv.${S.level}`;
+  return `
+  <div style="display:flex;gap:10px;align-items:center;width:min(860px,98%);justify-content:space-between;flex-wrap:wrap">
+    <div class="chip kh" style="background:var(--blue);color:#fff;font-size:20px;font-weight:900">កម្រិត ${lvl}
+      <span style="font-family:var(--jp);font-size:11px;margin-left:8px;opacity:.85">${stKh}・${stJp}</span></div>
+    <div class="chip" id="timer" style="background:var(--paper);border:3px solid var(--red);font-size:22px">⏱ --:--</div>
+    <div class="chip" id="stats" style="background:var(--paper);border:3px solid var(--gold)">🕐${S.group} ✅ ${S.cleared} 🎯 100%</div>
+  </div>
+  <div style="display:flex;gap:5px;margin-top:10px">
+    ${[1,2,3,4,5,6,7,8,9,10].map(lv=>{
+      const done=lv<S.level||(lv===10&&S.bonus>0);
+      return `<div class="ladder ${done?"done":lv===S.level?"cur":""}">${done?"✓":lv}</div>`;}).join("")}
+  </div>
+  ${S.reason?`<div class="kh sub" style="margin-top:6px">💪 ${esc(S.reason)}</div>`:""}
+  <div class="card" id="targetcard" style="padding:22px 26px;text-align:center;border-width:5px;margin-top:10px;width:min(860px,98%)">
+    <div class="kh" id="targettext" style="font-size:${S.level>=9?40:54}px;font-weight:900;line-height:1.5;word-break:break-all">${esc(S.target)}</div>
+    ${S.targetJp?`<div style="font-size:14px;font-weight:700;color:var(--blue);margin-top:6px">💬 ${esc(S.targetJp)}</div>`:""}
+    <div id="dots" style="display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+      ${chars.map(()=>'<div class="dot"></div>').join("")}</div>
+    <div style="height:10px;border-radius:999px;background:#EDE3CC;margin-top:12px;overflow:hidden">
+      <div id="bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--jade),var(--gold));transition:width .15s"></div></div>
+  </div>
+  <div id="hint" style="margin-top:12px"></div>
+  <div style="margin-top:14px;background:var(--paper);border-radius:24px;padding:16px 14px;border:3px solid #E8DCC2;overflow-x:auto;max-width:98%" id="kbwrap">
+    ${keyboardHTML(false)}</div>
+  <button onclick="endEarly()" style="margin-top:14px;background:none;border:none;color:#B49A6C;font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--jp)">បញ្ចប់មុន / 途中でおわる</button>`;
+}
+let prevKeyEl=null;
+function updateTimer(){
+  const t=$("timer");if(!t)return;
+  const mm=Math.floor(S.timeLeft/60),ss=String(S.timeLeft%60).padStart(2,"0");
+  t.textContent=`⏱ ${mm}:${ss}`;
+  if(S.timeLeft<=10){t.style.background="var(--red)";t.style.color="#fff";}
+}
+function updateGame(){
+  updateTimer();
+  const total=S.correct+S.err,acc=total?Math.round(S.correct/total*100):100;
+  const st=$("stats");if(st)st.textContent=`🕐${S.group} ✅ ${S.cleared} 🎯 ${acc}%`;
+  const chars=[...S.target];
+  const dots=$("dots");
+  if(dots)[...dots.children].forEach((d,i)=>{d.className="dot"+(i<S.pos?" done":i===S.pos?" cur":"");});
+  const bar=$("bar");if(bar)bar.style.width=(chars.length?Math.min(S.pos/chars.length,1)*100:0)+"%";
+  /* next key */
+  const nc=chars[S.pos];
+  const info=nc?KEYINFO[nc]:null;
+  if(prevKeyEl){prevKeyEl.classList.remove("next");prevKeyEl.style.background="#FFFDF5";
+    const m=prevKeyEl.querySelector(".main");if(m&&prevKeyEl.dataset.base)m.textContent=prevKeyEl.dataset.base;prevKeyEl=null;}
+  const shiftEl=$("k-shift");
+  if(shiftEl){shiftEl.classList.remove("next");shiftEl.style.background="#FFFDF5";
+    shiftEl.querySelector(".lat").style.color="#A08A62";}
+  const hint=$("hint");
+  if(info){
+    const f=FINGERS[FINGER_MAP[info.latin]]||FINGERS.rp;
+    const kid="k-"+(info.latin==="'"?"ap":info.latin);
+    const ke=$(kid);
+    if(ke){ke.classList.add("next");ke.style.background=f.color;
+      const m=ke.querySelector(".main");if(m&&info.shift&&ke.dataset.shift)m.textContent=ke.dataset.shift;
+      prevKeyEl=ke;}
+    if(info.shift&&shiftEl){shiftEl.classList.add("next");shiftEl.style.background="var(--red)";
+      shiftEl.querySelector(".lat").style.color="#fff";}
+    if(hint)hint.innerHTML=`<div style="display:flex;align-items:center;gap:14px;background:#fff;border-radius:999px;padding:8px 20px;border:3px solid ${f.color}">
+      <div style="width:52px;height:52px;border-radius:14px;background:${f.color};color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <span class="kh" style="font-size:24px;font-weight:900;line-height:1">${esc(nc)}</span>
+        <span style="font-size:10px;font-weight:800">${info.shift?"⇧+":""}${info.latin==="'"?"'":info.latin.toUpperCase()}</span></div>
+      <div><div class="kh" style="font-size:15px;font-weight:700">ចុចដោយ ${f.kh}${info.shift?" (ចុច Shift ជាមួយ)":""}</div>
+      <div class="sub">${f.jp}でおす${info.shift?"(Shiftをおしながら)":""}</div></div></div>`;
+  }else if(hint)hint.innerHTML="";
+}
+function handleInput(typed){
+  if(S.screen!=="game"||!typed)return;
+  const arr=[...S.target];
+  if(S.pos>=arr.length)return;
+  const tArr=[...typed];
+  const want=arr.slice(S.pos,S.pos+tArr.length).join("");
+  if(typed===want){
+    SND.correct();
+    S.correct+=tArr.length;
+    S.pos+=tArr.length;
+    if(S.pos>=arr.length){
+      SND.levelUp();confetti();S.cleared++;
+      const p=PRAISE[Math.floor(Math.random()*PRAISE.length)];
+      const atTop=S.level>=10;
+      const nextLbl=atTop?`Lv.10 +${S.bonus+1}`:`Lv.${S.level+1}`;
+      showOverlay(`<div style="font-size:44px">🪷🎉🇰🇭</div>
+        <div class="kh" style="font-size:46px;font-weight:900;color:var(--red);text-shadow:2px 2px 0 #fff">${p[0]}</div>
+        <div style="font-size:18px;font-weight:800;color:var(--blueD)">${p[1]}</div>
+        <div class="kh" style="font-size:16px;font-weight:700;margin-top:4px">→ ${nextLbl}!</div>`,950);
+      setTimeout(()=>{
+        if(S.screen!=="game")return;
+        if(atTop)S.bonus++;else S.level++;
+        loadLevel(S.level,S.target);
+        render();
+      },950);
+    }else updateGame();
+  }else{
+    SND.wrong();S.err++;
+    const tc=$("targetcard");
+    if(tc){tc.classList.remove("shakebox");void tc.offsetWidth;tc.classList.add("shakebox");}
+    updateGame();
+  }
+}
+window.addEventListener("keydown",e=>{
+  if(S.screen!=="game")return;
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key==="Shift"||e.key==="CapsLock"||e.key==="Tab")return;
+  e.preventDefault();
+  const k=e.key;let typed=k;
+  if(/^[a-z0-9']$/.test(k))typed=BASE2KH[k]||k;
+  else if(/^[A-Z]$/.test(k))typed=SHIFT2KH[k.toLowerCase()]||k;
+  else if(k==='"')typed=SHIFT2KH["'"]||k;
+  handleInput(typed);
+});
+
+/* ---- RESULT ---- */
+function saveResult(){
+  const total=S.correct+S.err,acc=total?Math.round(S.correct/total*100):100;
+  const seq=S.board.filter(r=>r.group===S.group).length+1;
+  S.myTag=`${ANIMALS[(seq-1)%ANIMALS.length]} No.${seq}`;
+  S.myId=Date.now();
+  S.board.push({id:S.myId,group:S.group,tag:S.myTag,level:S.level,bonus:S.bonus,keys:S.correct,acc});
+  lsSet("kt-board",S.board);
+}
+function resultHTML(){
+  const total=S.correct+S.err,acc=total?Math.round(S.correct/total*100):100;
+  const score=S.level+S.bonus;
+  const stars=score>=12?5:score>=10?4:score>=7?3:score>=4?2:1;
+  const msg=stars>=5?["អ្នកគឺជាជើងឯកពិតប្រាកដ!","きみは本物のチャンピオン!"]:
+   stars===4?["អ្នកបានបញ្ចប់ទាំង ១០ កម្រិត!","全10レベル制覇!すごい!"]:
+   stars===3?["ពូកែណាស់! បន្តទៀត!","すごくじょうず!この調子!"]:
+   stars===2?["ល្អណាស់! អ្នកកំពុងរីកចម្រើន!","いいね!どんどん成長してる!"]:
+   ["ការចាប់ផ្ដើមដ៏អស្ចារ្យ!","すばらしい第一歩!"];
+  const lvl=S.bonus>0?`Lv.10 +${S.bonus}`:`Lv.${S.level}`;
+  const rows=sortRows(S.board.filter(r=>r.group===S.group));
+  const stat=(e,v,kh,jp)=>`<div style="background:var(--cream);border-radius:16px;padding:10px 16px;border:2px solid var(--gold)">
+    <div style="font-size:20px">${e}</div><div style="font-size:22px;font-weight:800;color:var(--blueD)">${v}</div>
+    <div class="kh" style="font-size:11px">${kh}</div><div class="sub" style="font-size:10px">${jp}</div></div>`;
+  return `<div class="card" style="text-align:center;border-width:5px;margin-top:24px">
+    <div style="font-size:54px">🏆</div>
+    <div style="font-size:30px">${"⭐".repeat(stars)}${"☆".repeat(5-stars)}</div>
+    <div style="font-size:14px;font-weight:800;color:var(--blueD)">ក្រុមម៉ោង ${S.group} ・ グループ「${S.group}」
+      <span style="background:#FFF3C4;border-radius:999px;padding:2px 10px;margin-left:4px">${S.myTag||""}</span></div>
+    ${bi("អ្នកបានដល់","きみの記録",18)}
+    <div class="kh" style="font-size:58px;font-weight:900;color:var(--red);line-height:1.1">${lvl}</div>
+    <div class="sub" style="font-size:13px">とうたつレベル / កម្រិតដែលបានទៅដល់</div>
+    <div style="display:flex;justify-content:center;gap:18px;margin-top:14px;flex-wrap:wrap">
+      ${stat("✅",S.cleared,"កម្រិតបានឆ្លង","レベルクリア数")}
+      ${stat("⌨️",S.correct,"ចុចត្រូវ","正しく打った数")}
+      ${stat("🎯",acc+"%","ភាពត្រឹមត្រូវ","正確さ")}</div>
+    <div style="margin-top:14px">${bi(msg[0],msg[1],20,"var(--jade)")}</div>
+    ${S.reason?`<div class="kh" style="margin-top:12px;background:#E7F8F0;border-radius:14px;padding:10px 14px;font-size:13px">
+      💪 មូលហេតុរបស់អ្នក៖ ${esc(S.reason)}<br>
+      <span class="sub" style="font-family:var(--jp);font-size:11px">今日の練習は、この理由に一歩近づいたよ。</span></div>`:""}
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap">
+      <button class="bigbtn bb-red" style="width:auto" onclick="startGame()">
+        <div class="t1" style="font-size:18px">លេងម្ដងទៀត! 🔁</div><div class="t2">もういちど!</div></button>
+      <button class="bigbtn bb-blue" style="width:auto" onclick="show('home')">
+        <div class="t1" style="font-size:16px">ទំព័រដើម 🏠</div><div class="t2">ホームへ</div></button></div>
+  </div>
+  ${rows.length?`<div class="card blue">
+    ${bi(`🏆 ចំណាត់ថ្នាក់ក្រុមម៉ោង ${S.group}`,`グループ「${S.group}」のランキング(このPC・制限時間はみんな${S.minutes}分)`,18)}
+    ${rankRows(rows,S.myId)}</div>`:""}`;
+}
+
+render();
+</script>
+</body>
+</html>
